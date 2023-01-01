@@ -1,12 +1,9 @@
 import datetime
 import os
 
-from dotenv import load_dotenv
 from pydantic import BaseSettings
 
 from core.constants import GENRES_SETTINGS, MOVIES_SETTINGS, PERSONS_SETTINGS
-
-load_dotenv()
 
 
 class AppSettings(BaseSettings):
