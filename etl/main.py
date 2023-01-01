@@ -1,11 +1,16 @@
+from contextlib import closing
 from time import sleep
+
+import psycopg2
+from psycopg2.extras import DictCursor
 
 from core.connectors.elastic import ESLoader
 from core.connectors.postgres import PostgresConnector
 from core.connectors.redis import RedisStorage
 from core.etl.extracters import ElasticExtract
 from core.etl.loaders import PostgresLoader
-from core.settings import logging, TIME_TO_RESTART
+from core.settings import app_settings
+from core.logger import logging
 from core.utils.data import State
 
 
@@ -24,5 +29,7 @@ if __name__ == '__main__':
     es_loader = ESLoader(logger=logging)
 
     while True:
-        load_data(redis_state, pg_loader, es_loader)
-        sleep(TIME_TO_RESTART)
+        with closing(psycopg2.connect(**app_settings.POSTGRES_DSL, cursor_factory=DictCursor)) as pg_conn, pg_conn.cursor() as curs:
+            pg_loader.cursor = curs
+            load_data(redis_state, pg_loader, es_loader)
+            sleep(app_settings.TIME_TO_RESTART)

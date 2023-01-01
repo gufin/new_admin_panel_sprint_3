@@ -1,6 +1,7 @@
 import logging
 from functools import wraps
 from time import sleep
+from typing import Callable
 
 
 def backoff(
@@ -9,7 +10,7 @@ def backoff(
         border_sleep_time=10,
         logger=logging
 ):
-    def func_wrapper(func):
+    def func_wrapper(func: Callable) -> Callable:
         @wraps(func)
         def inner(*args, **kwargs):
             wait_time = start_sleep_time

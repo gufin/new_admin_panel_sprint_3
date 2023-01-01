@@ -1,7 +1,7 @@
-from abc import ABC
 from collections import defaultdict
-from typing import Dict
+from typing import Dict, Optional
 
+from core.logger import logging
 from core.models import (
     BasePersonElastic,
     Filmwork,
@@ -12,10 +12,9 @@ from core.models import (
     PersonElastic,
     PersonFilmWork,
 )
-from core.settings import logging
 
 
-class PostgresTransform(ABC):
+class PostgresTransform:
     @staticmethod
     def __get_base_data(record, mapper, result, parser):
         try:
@@ -29,7 +28,7 @@ class PostgresTransform(ABC):
         return item, data, result
 
     @staticmethod
-    def __get_mapping_persons(role, data):
+    def __get_mapping_persons(role: str, data) -> Optional[dict]:
         current_attr = f'{role}s'
         if current_attr not in data.dict().keys():
             return None
@@ -39,7 +38,7 @@ class PostgresTransform(ABC):
             'persons': getattr(data, current_attr)
         }
 
-    def __add_role_person(self, role, data, film):
+    def __add_role_person(self, role: str, data, film) -> None:
         try:
             person = Person(**film)
         except Exception as e:
@@ -50,7 +49,7 @@ class PostgresTransform(ABC):
                 data_mapping['persons'].append(
                     BasePersonElastic(**person.dict()))
 
-    def transform_film(self, records) -> Dict:
+    def transform_film(self, records: list) -> Dict:
         result = defaultdict(dict)
         for record in records:
             film, data, result = self.__get_base_data(record, Filmwork, result,
@@ -68,7 +67,7 @@ class PostgresTransform(ABC):
             result[film.id] = data
         return result
 
-    def transform_persons(self, records) -> Dict:
+    def transform_persons(self, records: list) -> Dict:
         result = defaultdict(dict)
         for record in records:
             person, data, result = self.__get_base_data(record, PersonFilmWork,
@@ -81,7 +80,7 @@ class PostgresTransform(ABC):
             result[person.id] = data
         return result
 
-    def transform_genres(self, records) -> Dict:
+    def transform_genres(self, records: list) -> Dict:
         result = defaultdict(dict)
         for record in records:
             genre, data, result = self.__get_base_data(record, GenreFilmwork,

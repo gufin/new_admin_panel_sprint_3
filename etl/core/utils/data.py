@@ -16,9 +16,9 @@ class DbLoader(abc.ABC):
         pass
 
 
-class State(abc.ABC):
+class State():
 
-    def __init__(self, storage: BaseStorage):
+    def __init__(self, storage: BaseStorage) -> None:
         self.storage = storage
 
     def set_state(self, key: str, value: Any) -> None:

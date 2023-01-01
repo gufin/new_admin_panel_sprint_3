@@ -1,11 +1,12 @@
-from typing import List
+from typing import List, Optional
 
 from core.connectors.postgres import PostgresConnector
 from core.constants import SQL_TEMPLATES
 
 
 class PostgresLoader(PostgresConnector):
-    def __get_data(self, template, params, table_name=None):
+    def __get_data(self, template: str, params: dict,
+                   table_name: Optional[str] = None) -> List:
         if table_name:
             sql_tmp = SQL_TEMPLATES.get(template).format(table_name, table_name)
         else:

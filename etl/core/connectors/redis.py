@@ -1,6 +1,7 @@
 from redis import exceptions, Redis
 
-from core.settings import logging, REDIS_DSL
+from core.logger import logging
+from core.settings import app_settings
 from core.utils.backoff import backoff
 from core.utils.data import DbLoader
 from core.utils.storages import BaseStorage
@@ -8,13 +9,13 @@ from core.utils.storages import BaseStorage
 
 class RedisStorage(DbLoader, BaseStorage):
 
-    def __init__(self, logger):
-        super(RedisStorage, self).__init__(logger=logger)
+    def __init__(self, logger: logging) -> None:
+        super().__init__(logger=logger)
         self.connect()
 
     @backoff(logger=logging)
-    def connect(self):
-        self.connection = Redis(**REDIS_DSL)
+    def connect(self) -> None:
+        self.connection = Redis(**app_settings.REDIS_DSL)
 
     @backoff(logger=logging)
     def save_state(self, state: dict) -> None:
